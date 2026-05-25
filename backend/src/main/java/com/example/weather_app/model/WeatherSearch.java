@@ -23,19 +23,19 @@ public class WeatherSearch {
     @Column(nullable = false)
     private String city;
 
-    private String country;
-    private double temperature;
-    private double feelsLike;
+    private String countryCode;
+    private double tempC;
+    private double feelsLikeC;
     private int humidity;
     private double windSpeed;
     private String description;
     private String icon;
 
     @Column(nullable = false)
-    private LocalDateTime searchedAt;
+    private LocalDateTime queriedAt;
 
     @PrePersist
     protected void onPrePersist() {
-        this.searchedAt = LocalDateTime.now();
+        this.queriedAt = LocalDateTime.now();
     }
 }

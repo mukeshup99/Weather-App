@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 public class WeatherResponse {
 
     private String city;
-    private String country;
-    private double temperature;
-    private double feelsLike;
-    private int humidity;
-    private double windSpeed;
+    private String countryCode;
+    private Double tempC;
+    private Double feelsLikeC;
+    private Integer humidity;
+    private Double windSpeed;
     private String description;
     private String icon;
-    private LocalDateTime fetchedAt;
+    private LocalDateTime queriedAt;
 }

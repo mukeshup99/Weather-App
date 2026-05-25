@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface WeatherSearchRepository extends JpaRepository<WeatherSearch, Long> {
 
-    List<WeatherSearch> findTop10ByOrderBySearchedAtDesc();
+    List<WeatherSearch> findTop10ByCityIgnoreCaseOrderByQueriedAtDesc(String city);
 }
