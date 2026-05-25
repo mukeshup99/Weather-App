@@ -4,6 +4,7 @@ import SearchBar from './components/SearchBar'
 import CurrentWeatherCard from './components/CurrentWeatherCard'
 import ForecastList from './components/ForecastList'
 import HistoryList from './components/HistoryList'
+import Skeleton from './components/Skeleton'
 import './App.css'
 
 export default function App() {
@@ -60,6 +61,8 @@ export default function App() {
             and your recent lookups.
           </div>
         )}
+
+        {loading && <Skeleton />}
 
         <CurrentWeatherCard data={current} />
         <ForecastList forecast={forecast} />
