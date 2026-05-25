@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -38,21 +37,28 @@ public class WeatherService {
     private final OpenWeatherProperties openWeatherProperties;
     private final WeatherSearchRepository weatherSearchRepository;
 
-    public WeatherResponse getCurrent(String city) {
-        String url = UriComponentsBuilder
-                .fromHttpUrl(openWeatherProperties.getBaseUrl() + "/weather")
-                .queryParam("q", city)
-                .queryParam("appid", openWeatherProperties.getApiKey())
-                .queryParam("units", "metric")
-                .build(false)
-                .toUriString();
+    // ----------------------- current weather -----------------------
 
+    public WeatherResponse getCurrent(String city) {
+        UriComponentsBuilder url = baseUrl("/weather").queryParam("q", city);
+        return executeCurrent(url, city);
+    }
+
+    public WeatherResponse getCurrentByCoords(double lat, double lon) {
+        UriComponentsBuilder url = baseUrl("/weather")
+                .queryParam("lat", lat)
+                .queryParam("lon", lon);
+        return executeCurrent(url, coordLabel(lat, lon));
+    }
+
+    private WeatherResponse executeCurrent(UriComponentsBuilder url, String notFoundLabel) {
         OpenWeatherApiResponse apiResponse;
         try {
-            apiResponse = restTemplate.getForObject(url, OpenWeatherApiResponse.class);
+            apiResponse = restTemplate.getForObject(url.build(false).toUriString(),
+                    OpenWeatherApiResponse.class);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new CityNotFoundException(city);
+                throw new CityNotFoundException(notFoundLabel);
             }
             throw new WeatherApiException("Error calling weather API: " + ex.getMessage());
         }
@@ -85,21 +91,28 @@ public class WeatherService {
         return toResponse(entity);
     }
 
-    public ForecastResponse getForecast(String city) {
-        String url = UriComponentsBuilder
-                .fromHttpUrl(openWeatherProperties.getBaseUrl() + "/forecast")
-                .queryParam("q", city)
-                .queryParam("appid", openWeatherProperties.getApiKey())
-                .queryParam("units", "metric")
-                .build(false)
-                .toUriString();
+    // ----------------------- forecast -----------------------
 
+    public ForecastResponse getForecast(String city) {
+        UriComponentsBuilder url = baseUrl("/forecast").queryParam("q", city);
+        return executeForecast(url, city);
+    }
+
+    public ForecastResponse getForecastByCoords(double lat, double lon) {
+        UriComponentsBuilder url = baseUrl("/forecast")
+                .queryParam("lat", lat)
+                .queryParam("lon", lon);
+        return executeForecast(url, coordLabel(lat, lon));
+    }
+
+    private ForecastResponse executeForecast(UriComponentsBuilder url, String notFoundLabel) {
         OpenWeatherForecastResponse apiResponse;
         try {
-            apiResponse = restTemplate.getForObject(url, OpenWeatherForecastResponse.class);
+            apiResponse = restTemplate.getForObject(url.build(false).toUriString(),
+                    OpenWeatherForecastResponse.class);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new CityNotFoundException(city);
+                throw new CityNotFoundException(notFoundLabel);
             }
             throw new WeatherApiException("Error calling forecast API: " + ex.getMessage());
         }
@@ -110,7 +123,7 @@ public class WeatherService {
 
         List<ForecastResponse.Day> days = reduceToDailyForecast(apiResponse.getList());
 
-        String name = apiResponse.getCity() != null ? apiResponse.getCity().getName() : city;
+        String name = apiResponse.getCity() != null ? apiResponse.getCity().getName() : notFoundLabel;
         String country = apiResponse.getCity() != null ? apiResponse.getCity().getCountry() : null;
 
         return ForecastResponse.builder()
@@ -120,12 +133,27 @@ public class WeatherService {
                 .build();
     }
 
+    // ----------------------- history -----------------------
+
     public List<WeatherResponse> getHistory(String city) {
         return weatherSearchRepository
                 .findTop10ByCityIgnoreCaseOrderByQueriedAtDesc(city)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    // ----------------------- helpers -----------------------
+
+    private UriComponentsBuilder baseUrl(String path) {
+        return UriComponentsBuilder
+                .fromUriString(openWeatherProperties.getBaseUrl() + path)
+                .queryParam("appid", openWeatherProperties.getApiKey())
+                .queryParam("units", "metric");
+    }
+
+    private static String coordLabel(double lat, double lon) {
+        return String.format("lat=%.4f,lon=%.4f", lat, lon);
     }
 
     private WeatherResponse toResponse(WeatherSearch entity) {

@@ -6,6 +6,7 @@ import ForecastList from './components/ForecastList'
 import HistoryList from './components/HistoryList'
 import Skeleton from './components/Skeleton'
 import UnitsToggle from './components/UnitsToggle'
+import LocationButton from './components/LocationButton'
 import './App.css'
 
 export default function App() {
@@ -42,6 +43,36 @@ export default function App() {
     }
   }
 
+  async function searchByCoords(lat, lon) {
+    setLoading(true)
+    setError('')
+    setCurrent(null)
+    setForecast(null)
+    setHistory([])
+
+    try {
+      const [cur, fc] = await Promise.allSettled([
+        weatherApi.currentByCoords(lat, lon),
+        weatherApi.forecastByCoords(lat, lon),
+      ])
+
+      if (cur.status === 'fulfilled') setCurrent(cur.value)
+      else throw cur.reason
+
+      if (fc.status === 'fulfilled') setForecast(fc.value)
+
+      // Once we know the resolved city name, fetch its history.
+      const resolved = cur.value?.city
+      if (resolved) {
+        try { setHistory(await weatherApi.history(resolved)) } catch (_) {}
+      }
+    } catch (e) {
+      setError(e.message || 'Something went wrong.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -56,6 +87,11 @@ export default function App() {
 
       <main className="app-main">
         <SearchBar onSearch={search} loading={loading} />
+        <LocationButton
+          onCoords={searchByCoords}
+          onError={setError}
+          loading={loading}
+        />
 
         {error && <div className="error">{error}</div>}
 

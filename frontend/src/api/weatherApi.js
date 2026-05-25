@@ -19,8 +19,15 @@ async function request(path) {
   return res.json()
 }
 
+function coordsQuery(lat, lon) {
+  return `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`
+}
+
 export const weatherApi = {
   current: (city) => request(`/weather/current?city=${encodeURIComponent(city)}`),
   forecast: (city) => request(`/weather/forecast?city=${encodeURIComponent(city)}`),
   history: (city) => request(`/weather/history?city=${encodeURIComponent(city)}`),
+
+  currentByCoords: (lat, lon) => request(`/weather/current?${coordsQuery(lat, lon)}`),
+  forecastByCoords: (lat, lon) => request(`/weather/forecast?${coordsQuery(lat, lon)}`),
 }

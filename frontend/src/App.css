@@ -105,6 +105,37 @@
   cursor: not-allowed;
 }
 
+/* Geolocation button (sits under the search row, full-width pill) */
+.location-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px dashed var(--card-border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.location-btn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.location-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.location-pin {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+
 /* Generic card */
 .card {
   background: var(--card-bg);
