@@ -15,6 +15,7 @@ export default function App() {
   const [history, setHistory] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [clearingHistory, setClearingHistory] = useState(false)
 
   async function search(city) {
     setLoading(true)
@@ -40,6 +41,19 @@ export default function App() {
       setError(e.message || 'Something went wrong.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function clearHistory() {
+    if (!current?.city) return
+    setClearingHistory(true)
+    try {
+      await weatherApi.clearHistory(current.city)
+      setHistory([])
+    } catch (e) {
+      setError(e.message || 'Could not clear history.')
+    } finally {
+      setClearingHistory(false)
     }
   }
 
@@ -106,7 +120,11 @@ export default function App() {
 
         <CurrentWeatherCard data={current} />
         <ForecastList forecast={forecast} />
-        <HistoryList history={history} />
+        <HistoryList
+          history={history}
+          onClear={clearHistory}
+          clearing={clearingHistory}
+        />
       </main>
 
       <footer className="app-footer muted small">

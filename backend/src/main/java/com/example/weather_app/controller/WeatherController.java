@@ -6,11 +6,14 @@ import com.example.weather_app.service.WeatherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Map;
 
 import java.util.List;
 
@@ -51,6 +54,20 @@ public class WeatherController {
     @GetMapping("/history")
     public ResponseEntity<List<WeatherResponse>> getHistory(@RequestParam String city) {
         return ResponseEntity.ok(weatherService.getHistory(city));
+    }
+
+    /**
+     * Delete every saved lookup for the given city. Returns the number of
+     * rows removed (always >= 0). Idempotent: hitting it twice on an
+     * already-empty city is fine and just returns deleted=0.
+     */
+    @DeleteMapping("/history")
+    public ResponseEntity<Map<String, Object>> clearHistory(@RequestParam String city) {
+        if (city == null || city.isBlank()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Query param 'city' is required");
+        }
+        long deleted = weatherService.clearHistory(city);
+        return ResponseEntity.ok(Map.of("city", city, "deleted", deleted));
     }
 
     /**

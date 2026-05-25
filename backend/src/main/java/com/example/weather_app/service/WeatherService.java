@@ -12,6 +12,7 @@ import com.example.weather_app.repository.WeatherSearchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -141,6 +142,15 @@ public class WeatherService {
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Delete every saved lookup for {@code city}. Returns the number of
+     * rows removed so the caller can echo it back to the client.
+     */
+    @Transactional
+    public long clearHistory(String city) {
+        return weatherSearchRepository.deleteByCityIgnoreCase(city);
     }
 
     // ----------------------- helpers -----------------------

@@ -3,6 +3,7 @@ package com.example.weather_app.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,6 +34,21 @@ public class GlobalExceptionHandler {
      * most specific @ExceptionHandler match, but the explicit handler
      * also makes the intent unambiguous.
      */
+    /**
+     * Spring throws this when a controller declares @RequestParam without
+     * required=false and the caller omits it. Default behavior is a 400
+     * with an HTML error page; here we return JSON with the same status
+     * so frontend error envelopes ({error, message}) work uniformly.
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, String>> handleMissingParam(MissingServletRequestParameterException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "error", HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        "message", "Required query parameter '" + ex.getParameterName() + "' is missing"));
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatus(ResponseStatusException ex) {
         HttpStatusCode status = ex.getStatusCode();

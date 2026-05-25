@@ -9,12 +9,25 @@ function formatTime(iso) {
   }
 }
 
-export default function HistoryList({ history }) {
+export default function HistoryList({ history, onClear, clearing }) {
   const { unit } = useUnits()
   if (!history || history.length === 0) return null
   return (
     <div className="card">
-      <h3>Recent lookups</h3>
+      <div className="history-header">
+        <h3>Recent lookups</h3>
+        {onClear && (
+          <button
+            type="button"
+            className="clear-btn"
+            onClick={onClear}
+            disabled={clearing}
+            aria-label="Clear recent lookups"
+          >
+            {clearing ? 'Clearing…' : 'Clear'}
+          </button>
+        )}
+      </div>
       <ul className="history-list">
         {history.map((h, i) => (
           <li key={i}>

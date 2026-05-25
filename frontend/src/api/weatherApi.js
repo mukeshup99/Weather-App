@@ -4,8 +4,8 @@
 
 const BASE = import.meta.env.VITE_API_BASE ?? '/api/v1'
 
-async function request(path) {
-  const res = await fetch(`${BASE}${path}`)
+async function request(path, init = {}) {
+  const res = await fetch(`${BASE}${path}`, init)
   if (!res.ok) {
     let detail = ''
     try {
@@ -16,6 +16,8 @@ async function request(path) {
     }
     throw new Error(detail || `Request failed (${res.status})`)
   }
+  // 204 No Content -> nothing to parse
+  if (res.status === 204) return null
   return res.json()
 }
 
@@ -30,4 +32,8 @@ export const weatherApi = {
 
   currentByCoords: (lat, lon) => request(`/weather/current?${coordsQuery(lat, lon)}`),
   forecastByCoords: (lat, lon) => request(`/weather/forecast?${coordsQuery(lat, lon)}`),
+
+  clearHistory: (city) => request(`/weather/history?city=${encodeURIComponent(city)}`, {
+    method: 'DELETE',
+  }),
 }
