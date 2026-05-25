@@ -111,6 +111,20 @@
   line-height: 1;
 }
 
+.current-icon {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.day-icon {
+  width: 56px;
+  height: 56px;
+  display: block;
+  margin: 4px auto 0;
+}
+
 .desc {
   font-size: 1.15rem;
   text-transform: capitalize;

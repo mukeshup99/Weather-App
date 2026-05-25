@@ -20,6 +20,15 @@ export default function CurrentWeatherCard({ data }) {
       </div>
 
       <div className="current-body">
+        {data.icon ? (
+          <img
+            className="current-icon"
+            src={`https://openweathermap.org/img/wn/${data.icon}@2x.png`}
+            alt={data.description ?? 'weather icon'}
+            width="96"
+            height="96"
+          />
+        ) : null}
         <div className="temp">
           {data.tempC != null ? `${Math.round(data.tempC)}°C` : '—'}
         </div>
