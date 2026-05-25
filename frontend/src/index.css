@@ -1,0 +1,36 @@
+:root {
+  --bg-grad-start: #4f8cff;
+  --bg-grad-end:   #6dd5ed;
+  --text:        #f8fafc;
+  --muted:       rgba(248, 250, 252, 0.7);
+  --card-bg:     rgba(255, 255, 255, 0.12);
+  --card-border: rgba(255, 255, 255, 0.25);
+  --error-bg:    rgba(239, 68, 68, 0.15);
+  --error-fg:    #fecaca;
+  --accent:      #fde68a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+code {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
