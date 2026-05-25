@@ -1,3 +1,5 @@
+import { formatTemp, useUnits } from '../units'
+
 function formatTime(iso) {
   if (!iso) return ''
   try {
@@ -8,6 +10,7 @@ function formatTime(iso) {
 }
 
 export default function CurrentWeatherCard({ data }) {
+  const { unit } = useUnits()
   if (!data) return null
   return (
     <div className="card current-card">
@@ -29,13 +32,11 @@ export default function CurrentWeatherCard({ data }) {
             height="96"
           />
         ) : null}
-        <div className="temp">
-          {data.tempC != null ? `${Math.round(data.tempC)}°C` : '—'}
-        </div>
+        <div className="temp">{formatTemp(data.tempC, unit)}</div>
         <div className="meta">
           <div className="desc">{data.description ?? '—'}</div>
           <div className="muted">
-            Feels like {data.feelsLikeC != null ? `${Math.round(data.feelsLikeC)}°C` : '—'}
+            Feels like {formatTemp(data.feelsLikeC, unit)}
             {' · '}Humidity {data.humidity ?? '—'}%
           </div>
         </div>

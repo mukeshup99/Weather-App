@@ -1,3 +1,5 @@
+import { formatTemp, useUnits } from '../units'
+
 function formatDay(iso) {
   if (!iso) return ''
   try {
@@ -12,6 +14,7 @@ function formatDay(iso) {
 }
 
 export default function ForecastList({ forecast }) {
+  const { unit } = useUnits()
   if (!forecast || !forecast.days || forecast.days.length === 0) return null
   return (
     <div className="card">
@@ -31,10 +34,10 @@ export default function ForecastList({ forecast }) {
               />
             ) : null}
             <div className="day-temp">
-              {d.maxTempC != null ? `${Math.round(d.maxTempC)}°` : '—'}
+              {formatTemp(d.maxTempC, unit, { withUnit: false })}
               <span className="muted small">
                 {' / '}
-                {d.minTempC != null ? `${Math.round(d.minTempC)}°` : '—'}
+                {formatTemp(d.minTempC, unit, { withUnit: false })}
               </span>
             </div>
             <div className="day-desc">{d.description ?? ''}</div>

@@ -18,6 +18,45 @@
   margin: 0;
 }
 
+.app-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Units toggle (header) */
+.units-toggle {
+  display: inline-flex;
+  padding: 4px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+}
+
+.units-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.units-btn:hover:not(.is-active) {
+  color: var(--text);
+}
+
+.units-btn.is-active {
+  background: var(--accent);
+  color: #1f2937;
+}
+
 .muted { color: var(--muted); }
 .small { font-size: 0.85rem; }
 

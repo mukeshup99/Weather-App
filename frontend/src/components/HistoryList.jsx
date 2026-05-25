@@ -1,3 +1,5 @@
+import { formatTemp, useUnits } from '../units'
+
 function formatTime(iso) {
   if (!iso) return ''
   try {
@@ -8,6 +10,7 @@ function formatTime(iso) {
 }
 
 export default function HistoryList({ history }) {
+  const { unit } = useUnits()
   if (!history || history.length === 0) return null
   return (
     <div className="card">
@@ -16,9 +19,7 @@ export default function HistoryList({ history }) {
         {history.map((h, i) => (
           <li key={i}>
             <span className="hist-time muted">{formatTime(h.queriedAt)}</span>
-            <span className="hist-temp">
-              {h.tempC != null ? `${Math.round(h.tempC)}°C` : '—'}
-            </span>
+            <span className="hist-temp">{formatTemp(h.tempC, unit)}</span>
             <span className="hist-desc">{h.description ?? ''}</span>
           </li>
         ))}

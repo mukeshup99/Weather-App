@@ -5,6 +5,7 @@ import CurrentWeatherCard from './components/CurrentWeatherCard'
 import ForecastList from './components/ForecastList'
 import HistoryList from './components/HistoryList'
 import Skeleton from './components/Skeleton'
+import UnitsToggle from './components/UnitsToggle'
 import './App.css'
 
 export default function App() {
@@ -44,9 +45,12 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>
-          <span aria-hidden="true">⛅</span> Weather App
-        </h1>
+        <div className="app-header-row">
+          <h1>
+            <span aria-hidden="true">⛅</span> Weather App
+          </h1>
+          <UnitsToggle />
+        </div>
         <p className="muted">Powered by Spring Boot + PostgreSQL + OpenWeatherMap</p>
       </header>
 
