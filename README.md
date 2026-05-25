@@ -61,47 +61,54 @@ Errors:
 ## Running locally
 
 You need:
-- Java 21+ and Maven
-- Node.js 18+ and npm
-- A PostgreSQL database called `weatherdb` (user `postgres` / password
-  `postgres` by default — see `backend/src/main/resources/application.yaml`)
-- An OpenWeatherMap API key
+- An OpenWeatherMap API key — free at <https://openweathermap.org/api>
+- **Either** Docker (recommended) **or** Java 21+ / Maven / PostgreSQL natively
+- Node.js 18+ and npm (for the frontend dev server)
 
-### 1. Start PostgreSQL
-
-Anything works as long as `weatherdb` is reachable on
-`localhost:5432`. The quickest path is Docker:
+### Quick start (Docker)
 
 ```bash
-docker run -d --name weather-pg \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=weatherdb \
-  -p 5432:5432 \
-  postgres:16
+cp .env.example .env          # then put your OPENWEATHER_API_KEY in .env
+docker compose up -d          # starts Postgres + backend on :5432 and :8080
+
+cd frontend && npm install && npm run dev   # frontend on :5173
 ```
 
-The backend will create the `weather_searches` table on first run
+Open <http://localhost:5173>.
+
+`docker compose up -d` builds the backend image from `backend/Dockerfile`
+(multi-stage: Maven build → 21-jre runtime) and brings up Postgres with
+a named volume so your saved searches survive `docker compose down`.
+
+To rebuild the backend after a code change:
+
+```bash
+docker compose up -d --build backend
+```
+
+### Without Docker (native dev loop)
+
+If you'd rather run the backend natively (faster reload):
+
+1. **PostgreSQL** — either `docker compose up -d postgres` (uses just
+   the Postgres service from the compose file) or any Postgres install
+   reachable on `localhost:5432` with `weatherdb` / `postgres` /
+   `postgres`.
+2. **Backend**:
+   ```bash
+   cd backend
+   OPENWEATHER_API_KEY=your_key_here mvn spring-boot:run
+   ```
+   The API comes up on `http://localhost:8080`.
+3. **Frontend**:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+The backend creates the `weather_searches` table on first run
 (`spring.jpa.hibernate.ddl-auto: update`).
-
-### 2. Start the backend
-
-```bash
-cd backend
-OPENWEATHER_API_KEY=your_key_here mvn spring-boot:run
-```
-
-The API comes up on `http://localhost:8080`.
-
-### 3. Start the frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open <http://localhost:5173>. Search a city — current conditions,
-the 5-day forecast, and recent lookups should all render.
 
 ## Tech choices
 

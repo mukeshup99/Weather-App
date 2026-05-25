@@ -1,0 +1,47 @@
+# One-command local stack for the Weather-App backend.
+#
+#   cp .env.example .env       # then set OPENWEATHER_API_KEY=...
+#   docker compose up -d
+#
+# Brings up Postgres (port 5432, persistent named volume) and the
+# Spring Boot backend (port 8080). The frontend stays out of compose
+# on purpose — `npm run dev` is the fast dev loop, and the Vite proxy
+# already targets http://localhost:8080.
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: weather-app-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weatherdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - weather-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "weatherdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    container_name: weather-app-backend
+    environment:
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:?Set OPENWEATHER_API_KEY in .env}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/weatherdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  weather-pg-data:
